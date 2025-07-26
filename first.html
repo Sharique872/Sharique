@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadmapBuilder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #4a1a4a, #7b2d7b, #9c4a9c);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Hexagonal Background Pattern */
+        .hex-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .hex {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            transform: rotate(45deg);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hex:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .hex:nth-child(2) { top: 20%; left: 15%; animation-delay: 1s; }
+        .hex:nth-child(3) { top: 15%; left: 85%; animation-delay: 2s; }
+        .hex:nth-child(4) { top: 60%; left: 10%; animation-delay: 3s; }
+        .hex:nth-child(5) { top: 70%; left: 90%; animation-delay: 4s; }
+        .hex:nth-child(6) { top: 40%; left: 5%; animation-delay: 0.5s; }
+        .hex:nth-child(7) { top: 80%; left: 20%; animation-delay: 1.5s; }
+        .hex:nth-child(8) { top: 25%; left: 95%; animation-delay: 2.5s; }
+        .hex:nth-child(9) { top: 90%; left: 80%; animation-delay: 3.5s; }
+        .hex:nth-child(10) { top: 5%; left: 70%; animation-delay: 4.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: rotate(45deg) translateY(0px); }
+            50% { transform: rotate(45deg) translateY(-20px); }
+        }
+
+        /* Connected dots pattern */
+        .dots {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+        }
+
+        .dot1 { top: 30%; left: 8%; }
+        .dot2 { top: 45%; left: 12%; }
+        .dot3 { top: 35%; left: 88%; }
+        .dot4 { top: 65%; left: 85%; }
+        .dot5 { top: 75%; left: 15%; }
+
+        .connection-line {
+            position: absolute;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .line1 {
+            top: 32%;
+            left: 8.5%;
+            width: 40px;
+            transform: rotate(35deg);
+        }
+
+        .line2 {
+            top: 66%;
+            right: 14%;
+            width: 30px;
+            transform: rotate(-45deg);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .logo span {
+            color: #c084fc;
+        }
+
+        .sign-in-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sign-in-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 40px;
+            line-height: 1.1;
+        }
+
+        .book-icon {
+            width: 120px;
+            height: 120px;
+            margin: 20px 0 40px 0;
+            position: relative;
+        }
+
+        .book-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 50px;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #a855f7, #c084fc);
+            border: none;
+            color: white;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(168, 85, 247, 0.6);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .main-title {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+                padding: 0 10px;
+            }
+
+            .search-input {
+                padding: 15px 20px;
+            }
+
+            .generate-btn {
+                padding: 14px 30px;
+                font-size: 16px;
+            }
+
+            .book-icon {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hexagonal Background Pattern -->
+    <div class="hex-pattern">
+        <div class="hex"></div>
+        <div class="hex"></div>
+        <div class="hex"></div>
+        <div class="hex"></div>
+        <div class="hex"></div>
+        <div class="hex"></div>
+        <div class="hex"></div>
+        <div class="hex"></div>
+        <div class="hex"></div>
+        <div class="hex"></div>
+        
+        <!-- Connection dots and lines -->
+        <div class="dots dot1"></div>
+        <div class="dots dot2"></div>
+        <div class="dots dot3"></div>
+        <div class="dots dot4"></div>
+        <div class="dots dot5"></div>
+        <div class="connection-line line1"></div>
+        <div class="connection-line line2"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            Roadmap<span>Builder</span>
+        </div>
+        <button class="sign-in-btn" onclick="window.location.href='login.html'">Sign In</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="main-title">Stop Googling. Start Learning.</h1>
+        
+        <div class="book-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 2v20h2v-2h8v2h2V2H6zm2 15V4h8v13H8z"/>
+                <rect x="9" y="6" width="6" height="1"/>
+                <rect x="9" y="8" width="6" height="1"/>
+                <rect x="9" y="10" width="4" height="1"/>
+                <circle cx="19" cy="6" r="1"/>
+                <circle cx="21" cy="8" r="1"/>
+                <circle cx="19" cy="10" r="1"/>
+            </svg>
+        </div>
+
+        <p class="subtitle">
+            Get a personalized roadmap to master any<br>
+            tech skills - with curated tutorials, videos and quizzes.
+        </p>
+
+        <div class="search-container">
+            <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Enter a skill you want to learn (e.g., JavaScript, Python, React)"
+            >
+<button class="generate-btn" onclick="window.location.href='java.html'">Generate Roadmap</button>
+        </div>
+    </main>
+</body>
+</html>
